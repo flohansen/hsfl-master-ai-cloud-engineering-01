@@ -13,8 +13,8 @@ import (
 func TestRouter(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	productsHandler := mocks.NewMockHandler(ctrl)
-	router := New(productsHandler)
+	productsController := mocks.NewMockController(ctrl)
+	router := New(productsController)
 
 	t.Run("should return 404 NOT FOUND if path is unknown", func(t *testing.T) {
 		// given
@@ -28,20 +28,124 @@ func TestRouter(t *testing.T) {
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
 
-	t.Run("should call products handler", func(t *testing.T) {
-		// given
-		w := httptest.NewRecorder()
-		r := httptest.NewRequest("GET", "/api/v1/products", nil)
+	t.Run("/api/v1/products", func(t *testing.T) {
+		t.Run("should return 404 NOT FOUND if method is not GET or POST", func(t *testing.T) {
+			tests := []string{"DELETE", "PUT", "HEAD", "CONNECT", "OPTIONS", "TRACE", "PATCH"}
 
-		productsHandler.
-			EXPECT().
-			ServeHTTP(w, r).
-			Times(1)
+			for _, test := range tests {
+				// given
+				w := httptest.NewRecorder()
+				r := httptest.NewRequest(test, "/api/v1/products", nil)
 
-		// when
-		router.ServeHTTP(w, r)
+				// when
+				router.ServeHTTP(w, r)
 
-		// then
-		assert.Equal(t, http.StatusOK, w.Code)
+				// then
+				assert.Equal(t, http.StatusNotFound, w.Code)
+			}
+		})
+
+		t.Run("should call GET handler", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("GET", "/api/v1/products", nil)
+
+			productsController.
+				EXPECT().
+				GetProducts(w, r).
+				Times(1)
+
+			// when
+			router.ServeHTTP(w, r)
+
+			// then
+			assert.Equal(t, http.StatusOK, w.Code)
+		})
+
+		t.Run("should call POST handler", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("POST", "/api/v1/products", nil)
+
+			productsController.
+				EXPECT().
+				PostProducts(w, r).
+				Times(1)
+
+			// when
+			router.ServeHTTP(w, r)
+
+			// then
+			assert.Equal(t, http.StatusOK, w.Code)
+		})
+	})
+
+	t.Run("/api/v1/products/:productid", func(t *testing.T) {
+		t.Run("should return 404 NOT FOUND if method is not GET, DELETE or PUT", func(t *testing.T) {
+			tests := []string{"POST", "HEAD", "CONNECT", "OPTIONS", "TRACE", "PATCH"}
+
+			for _, test := range tests {
+				// given
+				w := httptest.NewRecorder()
+				r := httptest.NewRequest(test, "/api/v1/products/1", nil)
+
+				// when
+				router.ServeHTTP(w, r)
+
+				// then
+				assert.Equal(t, http.StatusNotFound, w.Code)
+			}
+		})
+
+		t.Run("should call GET handler", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("GET", "/api/v1/products/1", nil)
+
+			productsController.
+				EXPECT().
+				GetProduct(w, r).
+				Times(1)
+
+			// when
+			router.ServeHTTP(w, r)
+
+			// then
+			assert.Equal(t, http.StatusOK, w.Code)
+		})
+
+		t.Run("should call PUT handler", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("PUT", "/api/v1/products/1", nil)
+
+			productsController.
+				EXPECT().
+				PutProduct(w, r).
+				Times(1)
+
+			// when
+			router.ServeHTTP(w, r)
+
+			// then
+			assert.Equal(t, http.StatusOK, w.Code)
+		})
+
+		t.Run("should call DELETE handler", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("DELETE", "/api/v1/products/1", nil)
+
+			productsController.
+				EXPECT().
+				DeleteProduct(w, r).
+				Times(1)
+
+			// when
+			router.ServeHTTP(w, r)
+
+			// then
+			assert.Equal(t, http.StatusOK, w.Code)
+		})
 	})
 }
