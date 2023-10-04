@@ -1,6 +1,7 @@
 package products
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -145,10 +146,61 @@ func TestDefaultController(t *testing.T) {
 	})
 
 	t.Run("GetProduct", func(t *testing.T) {
-		t.Run("should return one product", func(t *testing.T) {
+		t.Run("should return 400 BAD REQUEST if product id is not numerical", func(t *testing.T) {
 			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("GET", "/api/v1/products/aaa", nil)
+			r = r.WithContext(context.WithValue(r.Context(), "productid", "aaa"))
+
 			// when
+			controller.GetProduct(w, r)
+
 			// then
+			assert.Equal(t, http.StatusBadRequest, w.Code)
+		})
+
+		t.Run("should return 500 INTERNAL SERVER ERROR query failed", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("GET", "/api/v1/products/1", nil)
+			r = r.WithContext(context.WithValue(r.Context(), "productid", "1"))
+
+			productRepository.
+				EXPECT().
+				FindById(int64(1)).
+				Return(nil, errors.New("database error"))
+
+			// when
+			controller.GetProduct(w, r)
+
+			// then
+			assert.Equal(t, http.StatusInternalServerError, w.Code)
+		})
+
+		t.Run("should return 200 OK and product", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("GET", "/api/v1/products/1", nil)
+			r = r.WithContext(context.WithValue(r.Context(), "productid", "1"))
+
+			productRepository.
+				EXPECT().
+				FindById(int64(1)).
+				Return(&model.Product{ID: 1, Name: "test product", Retailer: "the company"}, nil)
+
+			// when
+			controller.GetProduct(w, r)
+
+			// then
+			res := w.Result()
+			var response model.Product
+			err := json.NewDecoder(res.Body).Decode(&response)
+
+			assert.NoError(t, err)
+			assert.Equal(t, http.StatusOK, w.Code)
+			assert.Equal(t, "application/json", w.Header().Get("Content-Type"))
+			assert.Equal(t, int64(1), response.ID)
+			assert.Equal(t, "test product", response.Name)
 		})
 	})
 

@@ -3,6 +3,7 @@ package products
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/product-service/products/model"
 )
@@ -62,7 +63,23 @@ func (ctrl *DefaultController) PostProducts(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (ctrl *DefaultController) GetProduct(http.ResponseWriter, *http.Request) {
+func (ctrl *DefaultController) GetProduct(w http.ResponseWriter, r *http.Request) {
+	productId := r.Context().Value("productid").(string)
+
+	id, err := strconv.ParseInt(productId, 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	product, err := ctrl.productRepository.FindById(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(product)
 }
 
 func (ctrl *DefaultController) PutProduct(http.ResponseWriter, *http.Request) {
