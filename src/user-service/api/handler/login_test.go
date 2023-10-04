@@ -105,6 +105,7 @@ func TestLoginHandler(t *testing.T) {
 		handler.ServeHTTP(w, r)
 
 		// then
+		assert.Equal(t, "Basic realm=Restricted", w.Header().Get("WWW-Authenticate"))
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
 	})
 
@@ -130,6 +131,7 @@ func TestLoginHandler(t *testing.T) {
 		handler.ServeHTTP(w, r)
 
 		// then
+		assert.Equal(t, "Basic realm=Restricted", w.Header().Get("WWW-Authenticate"))
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
 	})
 
