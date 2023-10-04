@@ -3,8 +3,8 @@ In this example we implement microservices of a webshop. This includes
 the following services:
 
 * [User Service](src/user-service/): Authentication features like registration and login.
-* **Product Service:** Holds detailed information about products like prices, sellers, etc.
-* **Ordering Service:** Holds information about user transactions.
+* [Product Service](src/product-service/): Holds detailed information about products like prices, sellers, etc.
+* [Ordering Service](src/ordering-service/): Holds information about user transactions.
 
 ## Developing
 
