@@ -205,10 +205,80 @@ func TestDefaultController(t *testing.T) {
 	})
 
 	t.Run("PutProduct", func(t *testing.T) {
+		t.Run("should return 400 BAD REQUEST if payload is not json", func(t *testing.T) {
+			tests := []io.Reader{
+				nil,
+				strings.NewReader(`{"invalid`),
+			}
+
+			for _, test := range tests {
+				// given
+				w := httptest.NewRecorder()
+				r := httptest.NewRequest("PUT", "/api/v1/products/1", test)
+
+				// when
+				controller.PutProduct(w, r)
+
+				// then
+				assert.Equal(t, http.StatusBadRequest, w.Code)
+			}
+		})
+
+		t.Run("should return 400 BAD REQUEST if payload is incomplete", func(t *testing.T) {
+			tests := []io.Reader{
+				strings.NewReader(`{"name":"test product"}`),
+				strings.NewReader(`{"price":99.99}`),
+				strings.NewReader(`{"retailer":"the company"}`),
+				strings.NewReader(`{"description":"description"}`),
+			}
+
+			for _, test := range tests {
+				// given
+				w := httptest.NewRecorder()
+				r := httptest.NewRequest("PUT", "/api/v1/products/1", test)
+
+				// when
+				controller.PutProduct(w, r)
+
+				// then
+				assert.Equal(t, http.StatusBadRequest, w.Code)
+			}
+		})
+
+		t.Run("should return 500 INTERNAL SERVER ERROR if query failed", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("PUT", "/api/v1/products/1",
+				strings.NewReader(`{"id": 999}`))
+
+			productRepository.
+				EXPECT().
+				Create([]*model.Product{{ID: 999}}).
+				Return(errors.New("database error"))
+
+			// when
+			controller.PutProduct(w, r)
+
+			// then
+			assert.Equal(t, http.StatusInternalServerError, w.Code)
+		})
+
 		t.Run("should update one product", func(t *testing.T) {
 			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("PUT", "/api/v1/products/1",
+				strings.NewReader(`{"id": 999}`))
+
+			productRepository.
+				EXPECT().
+				Create([]*model.Product{{ID: 999}}).
+				Return(nil)
+
 			// when
+			controller.PutProduct(w, r)
+
 			// then
+			assert.Equal(t, http.StatusOK, w.Code)
 		})
 	})
 
