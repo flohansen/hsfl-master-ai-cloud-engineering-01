@@ -5,11 +5,36 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/flohansen/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/product-service/products/model"
 )
 
 type PsqlRepository struct {
 	db *sql.DB
+}
+
+func NewPsqlRepository(config database.Config) (*PsqlRepository, error) {
+	db, err := sql.Open("postgres", config.Dsn())
+	if err != nil {
+		return nil, err
+	}
+
+	return &PsqlRepository{db}, nil
+}
+
+const createProductsTable = `
+create table if not exists products (
+	id          serial  primary key,
+	name        text    not null,
+	retailer    text    not null,
+	price       decimal not null default 0,
+	description text             default ''
+)
+`
+
+func (repo *PsqlRepository) Migrate() error {
+	_, err := repo.db.Exec(createProductsTable)
+	return err
 }
 
 const createProductsBatchQuery = `
