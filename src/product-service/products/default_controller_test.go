@@ -205,6 +205,19 @@ func TestDefaultController(t *testing.T) {
 	})
 
 	t.Run("PutProduct", func(t *testing.T) {
+		t.Run("should return 400 BAD REQUEST if product id is not numerical", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("PUT", "/api/v1/products/aaa", nil)
+			r = r.WithContext(context.WithValue(r.Context(), "productid", "aaa"))
+
+			// when
+			controller.PutProduct(w, r)
+
+			// then
+			assert.Equal(t, http.StatusBadRequest, w.Code)
+		})
+
 		t.Run("should return 400 BAD REQUEST if payload is not json", func(t *testing.T) {
 			tests := []io.Reader{
 				nil,
@@ -215,27 +228,7 @@ func TestDefaultController(t *testing.T) {
 				// given
 				w := httptest.NewRecorder()
 				r := httptest.NewRequest("PUT", "/api/v1/products/1", test)
-
-				// when
-				controller.PutProduct(w, r)
-
-				// then
-				assert.Equal(t, http.StatusBadRequest, w.Code)
-			}
-		})
-
-		t.Run("should return 400 BAD REQUEST if payload is incomplete", func(t *testing.T) {
-			tests := []io.Reader{
-				strings.NewReader(`{"name":"test product"}`),
-				strings.NewReader(`{"price":99.99}`),
-				strings.NewReader(`{"retailer":"the company"}`),
-				strings.NewReader(`{"description":"description"}`),
-			}
-
-			for _, test := range tests {
-				// given
-				w := httptest.NewRecorder()
-				r := httptest.NewRequest("PUT", "/api/v1/products/1", test)
+				r = r.WithContext(context.WithValue(r.Context(), "productid", "1"))
 
 				// when
 				controller.PutProduct(w, r)
@@ -250,10 +243,11 @@ func TestDefaultController(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("PUT", "/api/v1/products/1",
 				strings.NewReader(`{"id": 999}`))
+			r = r.WithContext(context.WithValue(r.Context(), "productid", "1"))
 
 			productRepository.
 				EXPECT().
-				Create([]*model.Product{{ID: 999}}).
+				Create([]*model.Product{{ID: 1}}).
 				Return(errors.New("database error"))
 
 			// when
@@ -268,10 +262,11 @@ func TestDefaultController(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("PUT", "/api/v1/products/1",
 				strings.NewReader(`{"id": 999}`))
+			r = r.WithContext(context.WithValue(r.Context(), "productid", "1"))
 
 			productRepository.
 				EXPECT().
-				Create([]*model.Product{{ID: 999}}).
+				Create([]*model.Product{{ID: 1}}).
 				Return(nil)
 
 			// when
@@ -283,10 +278,53 @@ func TestDefaultController(t *testing.T) {
 	})
 
 	t.Run("DeleteProduct", func(t *testing.T) {
-		t.Run("should delete one product", func(t *testing.T) {
+		t.Run("should return 400 BAD REQUEST if product id is not numerical", func(t *testing.T) {
 			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("DELETE", "/api/v1/products/aaa", nil)
+			r = r.WithContext(context.WithValue(r.Context(), "productid", "aaa"))
+
 			// when
+			controller.DeleteProduct(w, r)
+
 			// then
+			assert.Equal(t, http.StatusBadRequest, w.Code)
+		})
+
+		t.Run("should return 500 INTERNAL SERVER ERROR if query fails", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("DELETE", "/api/v1/products/1", nil)
+			r = r.WithContext(context.WithValue(r.Context(), "productid", "1"))
+
+			productRepository.
+				EXPECT().
+				Delete([]*model.Product{{ID: 1}}).
+				Return(errors.New("database error"))
+
+			// when
+			controller.DeleteProduct(w, r)
+
+			// then
+			assert.Equal(t, http.StatusInternalServerError, w.Code)
+		})
+
+		t.Run("should return 200 OK", func(t *testing.T) {
+			// given
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("DELETE", "/api/v1/products/1", nil)
+			r = r.WithContext(context.WithValue(r.Context(), "productid", "1"))
+
+			productRepository.
+				EXPECT().
+				Delete([]*model.Product{{ID: 1}}).
+				Return(nil)
+
+			// when
+			controller.DeleteProduct(w, r)
+
+			// then
+			assert.Equal(t, http.StatusOK, w.Code)
 		})
 	})
 }

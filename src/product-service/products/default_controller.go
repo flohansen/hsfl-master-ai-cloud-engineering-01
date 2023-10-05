@@ -16,7 +16,6 @@ type createProductRequest struct {
 }
 
 type updateProductRequest struct {
-	ID          int64   `json:"id"`
 	Name        string  `json:"name"`
 	Retailer    string  `json:"retailer"`
 	Price       float32 `json:"price"`
@@ -25,10 +24,6 @@ type updateProductRequest struct {
 
 func (r createProductRequest) isValid() bool {
 	return r.Name != "" && r.Retailer != ""
-}
-
-func (r updateProductRequest) isValid() bool {
-	return r.ID != 0
 }
 
 type DefaultController struct {
@@ -95,19 +90,22 @@ func (ctrl *DefaultController) GetProduct(w http.ResponseWriter, r *http.Request
 }
 
 func (ctrl *DefaultController) PutProduct(w http.ResponseWriter, r *http.Request) {
+	productId := r.Context().Value("productid").(string)
+
+	id, err := strconv.ParseInt(productId, 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	var request updateProductRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if !request.isValid() {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
 	if err := ctrl.productRepository.Create([]*model.Product{{
-		ID:          request.ID,
+		ID:          id,
 		Name:        request.Name,
 		Retailer:    request.Retailer,
 		Price:       request.Price,
@@ -118,5 +116,17 @@ func (ctrl *DefaultController) PutProduct(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (ctrl *DefaultController) DeleteProduct(http.ResponseWriter, *http.Request) {
+func (ctrl *DefaultController) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	productId := r.Context().Value("productid").(string)
+
+	id, err := strconv.ParseInt(productId, 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := ctrl.productRepository.Delete([]*model.Product{{ID: id}}); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
