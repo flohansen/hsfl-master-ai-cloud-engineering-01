@@ -4,7 +4,6 @@ the following services:
 
 * [User Service](src/user-service/): Authentication features like registration and login.
 * [Product Service](src/product-service/): Holds detailed information about products like prices, sellers, etc.
-* [Ordering Service](src/ordering-service/): Holds information about user transactions.
 
 ## Developing
 
