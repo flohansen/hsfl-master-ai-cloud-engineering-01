@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/flohansen/hsfl-master-ai-cloud-engineering/lib/gomockhelpers"
 	mocks "github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/_mocks"
-	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/_test_utils/gomockhelpers"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/user/model"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"

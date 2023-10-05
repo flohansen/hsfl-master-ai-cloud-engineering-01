@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/_test_utils/containerhelpers"
-	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/database"
+	"github.com/flohansen/hsfl-master-ai-cloud-engineering/lib/containerhelpers"
+	"github.com/flohansen/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/user/model"
 	"github.com/stretchr/testify/assert"
 )

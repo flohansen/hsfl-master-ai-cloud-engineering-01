@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/flohansen/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/api/handler"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/api/router"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/auth"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/crypto"
-	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/database"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/user"
 	"gopkg.in/yaml.v3"
 )

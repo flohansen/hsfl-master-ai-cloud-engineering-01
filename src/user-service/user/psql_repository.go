@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/database"
+	"github.com/flohansen/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/user-service/user/model"
 
 	_ "github.com/lib/pq"
