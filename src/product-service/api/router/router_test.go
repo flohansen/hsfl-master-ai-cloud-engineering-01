@@ -1,6 +1,7 @@
 package router
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -104,7 +105,7 @@ func TestRouter(t *testing.T) {
 
 			productsController.
 				EXPECT().
-				GetProduct(w, r).
+				GetProduct(w, r.WithContext(context.WithValue(r.Context(), "productid", "1"))).
 				Times(1)
 
 			// when
@@ -121,7 +122,7 @@ func TestRouter(t *testing.T) {
 
 			productsController.
 				EXPECT().
-				PutProduct(w, r).
+				PutProduct(w, r.WithContext(context.WithValue(r.Context(), "productid", "1"))).
 				Times(1)
 
 			// when
@@ -138,7 +139,7 @@ func TestRouter(t *testing.T) {
 
 			productsController.
 				EXPECT().
-				DeleteProduct(w, r).
+				DeleteProduct(w, r.WithContext(context.WithValue(r.Context(), "productid", "1"))).
 				Times(1)
 
 			// when

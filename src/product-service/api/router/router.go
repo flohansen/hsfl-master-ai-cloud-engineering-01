@@ -1,6 +1,7 @@
 package router
 
 import (
+	"context"
 	"net/http"
 	"regexp"
 
@@ -41,13 +42,26 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		matches := route.pattern.FindStringSubmatch(r.URL.Path)
 
 		if len(matches) > 0 {
-
+			r = createRequestContext(r, route.params, matches[1:])
 			route.handler(w, r)
 			return
 		}
 	}
 
 	w.WriteHeader(http.StatusNotFound)
+}
+
+func createRequestContext(r *http.Request, paramKeys []string, paramValues []string) *http.Request {
+	if len(paramKeys) == 0 {
+		return r
+	}
+
+	ctx := r.Context()
+	for i := 0; i < len(paramKeys); i++ {
+		ctx = context.WithValue(ctx, paramKeys[i], paramValues[i])
+	}
+
+	return r.WithContext(ctx)
 }
 
 func (router *Router) addRoute(method string, pattern string, handler http.HandlerFunc) {
