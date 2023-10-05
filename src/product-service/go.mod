@@ -8,6 +8,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/mock v0.3.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -55,7 +56,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230525234030-28d5490b6b19 // indirect
 	google.golang.org/grpc v1.57.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 replace github.com/flohansen/hsfl-master-ai-cloud-engineering/lib => ../../lib
