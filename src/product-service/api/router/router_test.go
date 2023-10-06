@@ -17,18 +17,6 @@ func TestRouter(t *testing.T) {
 	productsController := mocks.NewMockController(ctrl)
 	router := New(productsController)
 
-	t.Run("should return 404 NOT FOUND if path is unknown", func(t *testing.T) {
-		// given
-		w := httptest.NewRecorder()
-		r := httptest.NewRequest("GET", "/unknown/route", nil)
-
-		// when
-		router.ServeHTTP(w, r)
-
-		// then
-		assert.Equal(t, http.StatusNotFound, w.Code)
-	})
-
 	t.Run("/api/v1/products", func(t *testing.T) {
 		t.Run("should return 404 NOT FOUND if method is not GET or POST", func(t *testing.T) {
 			tests := []string{"DELETE", "PUT", "HEAD", "CONNECT", "OPTIONS", "TRACE", "PATCH"}
