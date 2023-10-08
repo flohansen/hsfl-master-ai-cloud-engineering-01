@@ -1,6 +1,6 @@
 ROOT_DIR="$(pwd)"
 
-for goModFile in $(find ./src -name '*.mod'); do
+for goModFile in $(find . -name '*.mod'); do
   currentGoRootDirectory="$(dirname "$goModFile")"
   echo ""
   echo "### $currentGoRootDirectory ###"
