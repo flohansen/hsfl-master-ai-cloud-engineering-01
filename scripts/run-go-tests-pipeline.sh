@@ -21,26 +21,5 @@ for goModFile in $(find . -name '*.mod'); do
     exit 1
   fi
 
-  # print only the total test coverage of the go module
-  COVERAGE=$(
-    go tool cover -func coverage.txt \
-      | grep 'total' \
-      | awk '{print $3}' \
-  )
-
-  rm -f coverage.txt
-
-  COVERAGE_NUMBER=$(
-    echo "${COVERAGE}" \
-      | sed -e 's/\.[0-9]*//' -e 's/%//'
-  )
-
-  case ${COVERAGE_NUMBER} in
-      [0-5][0-9]|[0-9]) COLOR="\033[31m" ;; # if coverage < 60%, then red color
-      *) COLOR="\033[32m"                   # otherwise green
-  esac
-
-  echo "Total test coverage: ${COLOR}${COVERAGE}\033[0m"
-
   cd "$ROOT_DIR" || exit 1
 done

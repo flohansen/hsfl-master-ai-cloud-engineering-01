@@ -1,0 +1,35 @@
+name: User Service
+
+on:
+  push:
+    paths:
+      - 'src/user-service'
+      - '.github/workflows/user-service.yml'
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run tests
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.x'
+
+      - name: Install dependencies
+        working-directory: ./src/user-service
+        run: go get .
+
+      - name: Go test
+        working-directory: ./src/user-service
+        run: go test ./... -race -coverprofile=coverage.out -covermode=atomic
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
