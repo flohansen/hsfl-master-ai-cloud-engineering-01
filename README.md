@@ -1,6 +1,7 @@
 # Cloud Engineering: Implementing and testing microservices in Go
 ![User Service](https://github.com/flohansen/hsfl-master-ai-cloud-engineering-01/actions/workflows/user-service.yml/badge.svg)
 ![Product Service](https://github.com/flohansen/hsfl-master-ai-cloud-engineering-01/actions/workflows/product-service.yml/badge.svg)
+[![codecov](https://codecov.io/gh/flohansen/hsfl-master-ai-cloud-engineering-01/graph/badge.svg?token=2SLAN65JV3)](https://codecov.io/gh/flohansen/hsfl-master-ai-cloud-engineering-01)
 
 In this example we implement microservices of a webshop. This includes
 the following services:
