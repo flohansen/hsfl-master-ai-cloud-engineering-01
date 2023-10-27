@@ -1,0 +1,21 @@
+{{ define "index" }}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Shop | HS Flensburg </title>
+        <script src="static/js/bundle.js"></script>
+        <link href="static/css/bundle.css" rel="stylesheet">
+    </head>
+    <body>
+        <ul class="products">
+            {{ range .Products }}
+            <li class="products__item">
+                <h3>{{ .Name }}</h3>
+                <span>von {{ .Retailer }}</span>
+                <span>für {{ .Price }}€</span>
+            </li>
+            {{ end }}
+        </ul>
+    </body>
+</html>
+{{ end }}

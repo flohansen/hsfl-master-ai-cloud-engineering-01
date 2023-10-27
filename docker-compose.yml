@@ -1,0 +1,43 @@
+services:
+  web:
+    build:
+      context: ./
+      dockerfile: ./src/web-service/Dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      PRODUCTS_ENDPOINT: products:3000
+    depends_on:
+      - products
+    links:
+      - products
+
+  products:
+    build:
+      context: ./
+      dockerfile: ./src/product-service/Dockerfile
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: test
+      DB_PASS: test
+      DB_NAME: test
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./src/product-service/sql/testdata.sql:/docker-entrypoint-initdb.d/init.sql

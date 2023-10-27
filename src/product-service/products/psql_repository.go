@@ -7,6 +7,8 @@ import (
 
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/product-service/products/model"
+
+	_ "github.com/lib/pq"
 )
 
 type PsqlRepository struct {

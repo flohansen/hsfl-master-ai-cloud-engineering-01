@@ -1,45 +1,40 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/product-service/api/router"
 	"github.com/flohansen/hsfl-master-ai-cloud-engineering/product-service/products"
-	"gopkg.in/yaml.v3"
 )
 
-type ApplicationConfig struct {
-	Database database.PsqlConfig `yaml:"database"`
-}
-
-func LoadConfigFromFile(path string) (*ApplicationConfig, error) {
-	f, err := os.Open(path)
+func GetenvInt(key string) int {
+	value := os.Getenv(key)
+	valueInt, err := strconv.Atoi(value)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	var config ApplicationConfig
-	if err := yaml.NewDecoder(f).Decode(&config); err != nil {
-		return nil, err
-	}
-
-	return &config, nil
+	return valueInt
 }
 
 func main() {
-	configPath := flag.String("config", "config.yml", "The path to the configuration file")
-	flag.Parse()
-
-	config, err := LoadConfigFromFile(*configPath)
-	if err != nil {
-		log.Fatalf("could not load application configuration: %s", err.Error())
+	config := database.PsqlConfig{
+		Host:     os.Getenv("DB_HOST"),
+		Port:     GetenvInt("DB_PORT"),
+		Username: os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASS"),
+		Database: os.Getenv("DB_NAME"),
 	}
 
-	productRepository, err := products.NewPsqlRepository(config.Database)
+	productRepository, err := products.NewPsqlRepository(config)
+	if err != nil {
+		log.Fatalf("could not create product repo: %s", err.Error())
+	}
+
 	productsController := products.NewDefaultController(productRepository)
 	handler := router.New(productsController)
 
